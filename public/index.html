@@ -7,6 +7,10 @@
 <script src="js/jquery-2.1.4.min.js"></script>
 <script src="js/raphael-min.js"></script>
 
+<script src="js/streamdataio-auth.min.js"></script>
+<script src="js/streamdataio.min.js"></script>
+<script src="js/json-patch-duplex.min.js"></script>
+
 <script>
   // display cows - polling version
   
@@ -86,10 +90,102 @@
 </script>
 
 <script>
+  
+  var cowsList = [];
+  
+  var elembis = document.getElementById("cowsbis");
+  elembis.innerHTML = "<div id='cowsbis-canvas' style='margin: auto; background: white; width:" + 600 + "px; height:" + 400 + "px;'></div>";
+  var paperbis = Raphael("cowsbis-canvas", 600, 400);  
+  
+  var handleCallback = function (arrayOfCows) {
+    
+    //console.log("SSE:", JSON.parse(msg.data))
+    //var cows = JSON.parse(arrayOfCows);
+    var cows = arrayOfCows;
+        
+    if(cowsList.length==0) { // first time
+      cows.forEach(function(cow) {
+        cowsList.push(new Cow(cow.nickname, cow.sex, cow.x, cow.y, cow.size, paperbis));
+      }); 
+      
+           
+    } else {
+      var spaceCow = null;
+      cows.forEach(function(cow) {
+
+        // search the cow
+        spaceCow = cowsList.filter(function(spaceCow) { return spaceCow.nickname == cow.nickname; })[0];
+        
+        //find cows that does not exist anymore
+        cowsList.forEach(function(spaceCowrec) {
+          var res = cows.filter(function(cow) { return spaceCowrec.nickname == cow.nickname; })[0];
+          if (res==null) {
+            console.log("deleted", spaceCowrec)
+            
+            // delete from cowsList
+            var index = cowsList.indexOf(spaceCowrec);
+            cowsList.splice(index, 1);
+            spaceCowrec.remove();
+            
+          }
+        })
+
+        
+        if(spaceCow!=null) {
+
+          spaceCow.xVelocity = cow.xVelocity;
+          spaceCow.yVelocity = cow.yVelocity;
+          spaceCow.size = cow.size;
+          spaceCow.move();
+          
+        } else { // there is a new cow!!!
+          spaceCow = new Cow(cow.nickname, cow.sex, cow.x, cow.y, cow.size, paperbis);
+          cowsList.push(spaceCow);
+          spaceCow.xVelocity = cow.xVelocity;
+          spaceCow.yVelocity = cow.yVelocity;
+          spaceCow.size = cow.size;
+          spaceCow.move();              
+        }
+        
+        
+      });
+    }
+    
+  }    
+  
+  
+  //http://spacecows.cleverapps.io/api/cows
+  var cowsData = null;
+  
+  var cowsEventSource = streamdataio.createEventSource(
+    "http://spacecows.cleverapps.io/api/cows", 
+    "NDYzYjBlYjgtYmZkOC00MzJkLWJhNzMtYmY3NjNiMGU4YzE4",
+    cowsData
+  );    
+  
+  cowsEventSource.onData(function(snapshot) {
+      console.log("[Cows]onData", snapshot);
+      cowsData = snapshot;
+      handleCallback(cowsData)
+  }).onPatch(function(patch) {
+      
+      jsonpatch.apply(cowsData, patch);
+      console.log("[Cows]onPatch", cowsData);
+      handleCallback(cowsData)
+  });
+  
+  cowsEventSource.open()
+</script>
+
+
+
+
+
+<script>
   // display cows - SSE version
   
   // handles the callback from the received event
-  
+/*  
   var cowsList = [];
   
   var elembis = document.getElementById("cowsbis");
@@ -100,6 +196,7 @@
   var start = (new Date()).getTime()
   
   var handleCallback = function (msg) {
+    
     //console.log("SSE:", JSON.parse(msg.data))
     var cows = JSON.parse(msg.data);
         
@@ -155,8 +252,9 @@
     
   }  
   
-  //var source = new EventSource('api/cows/sse/all');
-  //source.addEventListener('message', handleCallback, false);
+  var source = new EventSource('api/cows/sse/all');
+  source.addEventListener('message', handleCallback, false);
+*/
 </script>
 
 <script>
