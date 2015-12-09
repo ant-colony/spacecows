@@ -172,6 +172,8 @@
       jsonpatch.apply(cowsData, patch);
       console.log("[Cows]onPatch", cowsData);
       handleCallback(cowsData)
+  }).onError(function(err) {
+    console.log(err);
   });
   
   cowsEventSource.open()
