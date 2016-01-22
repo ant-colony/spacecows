@@ -48,9 +48,10 @@ export class CowsController extends RoutesController {
           console.log(err);
       });        
     });
-    
-    this.worker.start("go");
-    console.log("SSE Worker is started.")
+
+    // use it if you want to generate SSE data
+    //this.worker.start("go");
+    //console.log("SSE Worker is started.")
 
   }
   

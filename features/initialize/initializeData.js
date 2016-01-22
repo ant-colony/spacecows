@@ -6,47 +6,6 @@ let random = (maxNum) => {
   return Math.ceil(Math.random() * maxNum);
 };
 
-/*--- initialize some users ---*/
-export function generateUsersData(dbCollection) {
-  let users = [
-    {
-      login:"bob", 
-      firstName:"Bob", 
-      lastName:"Morane", 
-      email:"bob.morane@gmail.com", // login is email
-      language:"EN", 
-      password: crypt(config().secret).encrypt("morane"),
-      role: "admin"
-    },
-    {
-      login:"john", firstName:"John", lastName:"Doe", 
-      email:"john.doe@gmail.com", language:"EN", 
-      password: crypt(config().secret).encrypt("doe"), role: "reader"
-    }, 
-    { 
-      login:"jane", firstName:"Jane", lastName:"Doe", 
-      email:"jane.doe@gmail.com", language:"EN", 
-      password: crypt(config().secret).encrypt("doe"), role: "supervisor"
-    }
-  ];     
-  return new Promise((resolve, reject) => {
-    
-    dbCollection.count({}, (err, count) => {
-      if(err) reject(err);
-      if(count>0) {
-        resolve(true)
-      } else {
-        dbCollection.insert(users, (err, newUsers) => {
-          if(err) reject(err);
-          resolve(newUsers)
-        });           
-      }
-    });
-    
-  });
-  
-}
-
 
 /*--- initialize some cows ---*/
 export function generateCowsData(dbCollection) {

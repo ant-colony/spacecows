@@ -1,7 +1,7 @@
 export default function config() {
 
   return {
-    httpPort:8080,
+    httpPort:8081,
     secret: "KillTheCat",
     tokenExpiration: 20000, // seconds
     constraints: { // constraints for cow

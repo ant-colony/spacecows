@@ -158,8 +158,8 @@
   var cowsData = null;
   
   var cowsEventSource = streamdataio.createEventSource(
-    "http://spacecows.cleverapps.io/api/cows", 
-    "NDYzYjBlYjgtYmZkOC00MzJkLWJhNzMtYmY3NjNiMGU4YzE4",
+    "http://spacecows.cleverapps.io/api/cows",
+    "here_app_token",
     cowsData
   );    
   
@@ -183,132 +183,5 @@
 
 
 
-
-<script>
-  // display cows - SSE version
-  
-  // handles the callback from the received event
-/*  
-  var cowsList = [];
-  
-  var elembis = document.getElementById("cowsbis");
-  elembis.innerHTML = "<div id='cowsbis-canvas' style='margin: auto; background: white; width:" + 600 + "px; height:" + 400 + "px;'></div>";
-  var paperbis = Raphael("cowsbis-canvas", 600, 400);  
-  
-  
-  var start = (new Date()).getTime()
-  
-  var handleCallback = function (msg) {
-    
-    //console.log("SSE:", JSON.parse(msg.data))
-    var cows = JSON.parse(msg.data);
-        
-    if(cowsList.length==0) { // first time
-      cows.forEach(function(cow) {
-        cowsList.push(new Cow(cow.nickname, cow.sex, cow.x, cow.y, cow.size, paperbis));
-      }); 
-      
-           
-    } else {
-      var spaceCow = null;
-      cows.forEach(function(cow) {
-
-        // search the cow
-        spaceCow = cowsList.filter(function(spaceCow) { return spaceCow.nickname == cow.nickname; })[0];
-        
-        //find cows that does not exist anymore
-        cowsList.forEach(function(spaceCowrec) {
-          var res = cows.filter(function(cow) { return spaceCowrec.nickname == cow.nickname; })[0];
-          if (res==null) {
-            console.log("deleted", spaceCowrec)
-            
-            // delete from cowsList
-            var index = cowsList.indexOf(spaceCowrec);
-            cowsList.splice(index, 1);
-            spaceCowrec.remove();
-            
-          }
-        })
-
-        
-        if(spaceCow!=null) {
-
-          spaceCow.xVelocity = cow.xVelocity;
-          spaceCow.yVelocity = cow.yVelocity;
-          spaceCow.size = cow.size;
-          spaceCow.move();
-          
-        } else { // there is a new cow!!!
-          spaceCow = new Cow(cow.nickname, cow.sex, cow.x, cow.y, cow.size, paperbis);
-          cowsList.push(spaceCow);
-          spaceCow.xVelocity = cow.xVelocity;
-          spaceCow.yVelocity = cow.yVelocity;
-          spaceCow.size = cow.size;
-          spaceCow.move();              
-        }
-        
-        
-      });
-    }
-    var moment = (new Date()).getTime()
-    //console.log((moment-start)/1000,"secs");
-    
-  }  
-  
-  var source = new EventSource('api/cows/sse/all');
-  source.addEventListener('message', handleCallback, false);
-*/
-</script>
-
-<script>
-  /**/
-  var john = {
-    email:'john.doe@gmail.com', password:'doe'
-  }
-  var bob = {
-    email: 'bob.morane@gmail.com', password: 'morane'   
-  }
-  
-  $.ajax({
-    type: "POST", url:"/api/users/authenticate", dataType:"json", data:bob
-  }).then(function(data) {
-    window.localStorage.setItem('token', data.token);
-    console.log("api/users/authenticate", data);
-    $.ajaxSetup({
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'x-access-token': data.token
-      }
-    }); 
-    
-    $.get("/api/yo/onlyadmin").then(function(data) {
-      console.log(data);
-    }).fail(function(err) {
-      console.log("error", err);
-    })
-       
-    
-  }).fail(function(err) {
-    console.log("error", err);
-    window.localStorage.removeItem('token');
-    $.ajaxSetup({
-      headers: {
-        'x-access-token': null
-      }
-    });   
-    
-    $.get("/api/yo/onlyadmin").then(function(data) {
-      console.log(data);
-    }).fail(function(err) {
-      console.log("error", err);
-    })    
-    
-     
-  })
-  
-  
-
-</script>
 
 

@@ -7,17 +7,15 @@ import Datastore from 'nedb';
 import {Cow} from './features/cows/cow';
 
 /*--- controllers ---*/
-import {UsersController} from './features/users/usersController';
 import {CowsController} from './features/cows/cowsController';
-import {YoController} from './features/yo/yoController';
 
 /*--- error handler (middleware) ---*/
 import errorHandler from './middlewares/errorHandler';
 
 import config from './app.config';
 
-/*--- datat ---*/
-import {generateUsersData, generateCowsData} from './features/initialize/initializeData';
+/*--- data ---*/
+import {generateCowsData} from './features/initialize/initializeData';
 
 let app = express(), httpPort = config().httpPort;
 
@@ -28,7 +26,7 @@ app
   
 /*--- Database and collections ---*/
 let db = {};
-db.users = new Datastore('./users.db');
+
 db.cows = new Datastore('./cows.db');
 let dbUsersPromise = () => new Promise((resolve, reject) => {
   db.users.loadDatabase(err => {
@@ -47,10 +45,10 @@ let dbCowsPromise = () => new Promise((resolve, reject) => {
 /*
   - start express when all databases are loaded
 */
-Promise.all([dbUsersPromise(), dbCowsPromise()])
+Promise.all([dbCowsPromise()])
   .then(results => {
     
-    Promise.all([generateUsersData(db.users), generateCowsData(db.cows)]) // Initialize data if first time
+    Promise.all([generateCowsData(db.cows)]) // Initialize data if first time
       .then(results => {
         
         // if all is OK we have to load and start cows
@@ -66,9 +64,7 @@ Promise.all([dbUsersPromise(), dbCowsPromise()])
         }).catch(err => console.log("Error when starting space cows....", err));    
         
         app
-          .use('/api/users', new UsersController(db.users).router)
           .use('/api/cows', new CowsController(db.cows).router)
-          .use('/api/yo', new YoController().router) // for tests
           .use(errorHandler) // always last use
           
         app.listen(httpPort);
@@ -81,7 +77,4 @@ Promise.all([dbUsersPromise(), dbCowsPromise()])
   .catch(err => {
     console.log("Error when loading collections", err)
   });
-  
-/*
-nodemon --exec babel-node app.js -- *.*
-*/
+
