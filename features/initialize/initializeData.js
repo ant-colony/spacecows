@@ -1,5 +1,4 @@
 /*--- initialize NeDB data ---*/
-import crypt from '../../core/security/crypto-ctr';
 import config from '../../app.config';
 
 let random = (maxNum) => {
